@@ -9,7 +9,7 @@ const pool = new Pool({
 });
 
 const getPosts = async () => {
-  const { rows } = await pool.query("SELECT * FROM posts ORDER BY id ASC");
+  const { rows } = await pool.query("SELECT * FROM posts");
   return rows;
 };
 

@@ -16,26 +16,22 @@ app.listen(3000, console.log("SERVIDOR ENCENDIDO"));
 
 app.get("/posts", async (req, res) => {
   try {
-    const result = await getPosts();
-    return res
-      .status(200)
-      .json({ ok: true, message: "Posts obtenidos con éxito", result });
+    const posts = await getPosts();
+    res.send(posts);
   } catch (error) {
-    const { status, message } = handleErrors(error.code);
-    return res.status(status).json({ ok: false, result: message });
+    const errorResponse = handleErrors(error.code || 500);
+    res.status(errorResponse.status).send(errorResponse.message);
   }
 });
 
 app.post("/posts", async (req, res) => {
   try {
     const { titulo, url, descripcion } = req.body;
-    const result = await postPosts(titulo, url, descripcion);
-    return res
-      .status(201)
-      .json({ ok: true, message: "Post agregado con éxito", result });
+    await postPosts(titulo, url, descripcion);
+    res.send("Post agregado con éxito");
   } catch (error) {
-    const { status, message } = handleErrors(error.code);
-    return res.status(status).json({ ok: false, result: message });
+    const errorResponse = handleErrors(error.code || 500);
+    res.status(errorResponse.status).send(errorResponse.message);
   }
 });
 
@@ -43,32 +39,22 @@ app.put("/posts/like/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { likes } = req.body;
-    const result = await updateLikes(id, likes);
-    return res.status(200).json({
-      success: true,
-      message: "Post modificado con éxito",
-      result,
-    });
+    await updateLikes(id, likes);
+    res.send("Post modificado con éxito");
   } catch (error) {
-    const { status, message } = handleErrors(error.code);
-    return res
-      .status(status)
-      .json({ ok: false, result: message + " : " + error.column });
+    const errorResponse = handleErrors(error.code || 500);
+    res.status(errorResponse.status).json({ error: errorResponse.message });
   }
 });
 
 app.delete("/posts/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await deletePosts(id);
-    return res.status(200).json({
-      success: true,
-      message: "Post eliminado con éxito",
-      id: result,
-    });
+    await deletePosts(id);
+    res.send("Post eliminado con éxito");
   } catch (error) {
-    const { status, message } = handleErrors(error.code);
-    return res.status(status).json({ ok: false, result: message });
+    const errorResponse = handleErrors(error.code || 500);
+    res.status(errorResponse.status).send(errorResponse.message);
   }
 });
 

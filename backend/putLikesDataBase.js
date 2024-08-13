@@ -1,21 +1,18 @@
 const { pool } = require("./getPostsDataBase");
 
-const updateLikes = async (id, likes) => {
-  if (likes === undefined) {
-    const result = await pool.query("SELECT likes FROM posts WHERE id = $1", [
-      id,
-    ]);
+const updateLikes = async (id, likes, updates) => {
+  const { titulo, img, descripcion } = updates;
 
-    const currentLikes = result.rows[0].likes;
-    const newLikes = currentLikes + 1;
+  const result = await pool.query("SELECT * FROM posts WHERE id = $1", [id]);
 
-    await pool.query("UPDATE posts SET likes = $1 WHERE id = $2", [
-      newLikes,
-      id,
-    ]);
-  } else {
-    await pool.query("UPDATE posts SET likes = $1 WHERE id = $2", [likes, id]);
-  }
+  const currentPost = result.rows[0];
+
+  const newLikes = likes === undefined ? currentPost.likes + 1 : likes;
+
+  await pool.query(
+    "UPDATE posts SET likes = $1, titulo = COALESCE($2, titulo), img = COALESCE($3, img), descripcion = COALESCE($4, descripcion) WHERE id = $5",
+    [newLikes, titulo, img, descripcion, id]
+  );
 };
 
 module.exports = { updateLikes };

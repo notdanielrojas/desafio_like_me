@@ -38,8 +38,8 @@ app.post("/posts", async (req, res) => {
 app.put("/posts/like/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { likes } = req.body;
-    await updateLikes(id, likes);
+    const { likes, titulo, img, descripcion } = req.body;
+    await updateLikes(id, likes, { titulo, img, descripcion });
     res.send("Post modificado con éxito");
   } catch (error) {
     const errorResponse = handleErrors(error.code || 500);
